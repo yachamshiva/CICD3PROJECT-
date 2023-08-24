@@ -1,0 +1,51 @@
+pipeline {
+	agent any
+	stages{
+		stage('Pull the code'){
+		  steps {
+		     echo "pulling the code/Dockerfile from github"
+		     git url:"https://github.com/myac/myrepo.git", branch: "main or master"	
+		  }
+		}
+		stage(){
+		  steps {
+		    echo "Build the image from code/Dockerfile"	
+		    sh "docker build -t myappimg ."
+		  }
+		}
+		stage(){
+		  steps {
+		     echo "push the image to dockerhub"
+		     withCredentials([usernamePassword(credentialId:"mydockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubVariable")]){
+		     sh "docker tag myappimg ${env.dockerHubUser}/myappimg:v1"
+		     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+ 		     sh "docker push ${env.dockerHubUser}/myappimg:v1"
+		     }	
+		  }
+		}	
+		stage(){
+		  steps {
+		     echo "Deploing the image to container"	
+		  }
+		}
+	}
+}
+
+
+
+
+
+
+
+for docker login credential::
+
+manage-jenkins-->security-->credentials-->system-->global credentials-->
+
+New credential::
+
+user name n password...
+
+ID==> mydokerhub
+
+my docker hub credential in description
+

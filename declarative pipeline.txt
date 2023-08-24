@@ -1,0 +1,25 @@
+pipeline {
+	agent any
+	stages{
+		stage('Pull the code'){
+		  steps {
+		     echo "pulling the code/Dockerfile from github"	
+		  }
+		}
+		stage("build img"){
+		  steps {
+		    echo "Build the image from code/Dockerfile"	
+		  }
+		}
+		stage(){
+		  steps {
+		     echo "push the image to dockerhub"	
+		  }
+		}	
+		stage(){
+		  steps {
+		     echo "Deploing the image to container"	
+		  }
+		}
+	}
+}

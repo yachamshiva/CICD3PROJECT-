@@ -1,0 +1,84 @@
+node{
+    stage("code from github"){
+    git 'https://github.com/<address>'
+}
+    stage("Build docker image"){
+    sh 'docker image build  -t $JOB_NAME:v1.$BUILD_ID .'
+    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID <hub ac>/$JOB_NAME:v1.$BUILD_ID'
+    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID <hub ac>/$JOB_NAME:latest'
+}
+    stage("Push image to docker hub:){=>
+    --> generate variable for password using ***{-->
+
+    sh 'docker login -u manabnandi4do -p ${dockerhubpasswd}'
+    sh 'docker image push <hub ac>/$JOB_NAME:v1.$BUILD_ID
+    sh 'docker image push <hub ac>/$JOB_NAME:latest
+    sh 'docker image rmi  $JOB_NAME:v1.$BUILD_ID <hub ac>/$JOB_NAME:v1.$BUILD_ID <hub ac>/$JOB_NAME:latest
+<--}
+
+<=}
+    stage("Deploy docker container"){			
+    def dockerrun = 'docker run -p 8000:80 -d --name cicdtest <<hub ac>>/<repo>:latest
+    def dockerrm = 'docker container rm -f cicdtest'
+    def dockerimagerm = 'docker image rmi <<docker image of docker host>>
+    sshagent(['dockerhostpassword']){		****--> paste the generated pipeline script
+    //some block
+    sh "ssh -o StrickHostKeyChecking=no ec2-user@<priv ip> ${dockerrm}"
+    sh "ssh -o StrickHostKeyChecking=no ec2-user@<priv ip> ${dockerimagerm}"
+    sh "ssh -o StrickHostKeyChecking=no ec2-user@<priv ip> ${dockerrun}"
+  }
+}
+}
+
+
+***
+-> click on Pipeline syntax
+-> Steps:Sample steps-> withCredentials: Bind credentials to variables
+-> Bindings->Add->Secret text-->variable=>dockerhubpasswd
+-> Add->jenkins->secretText-> Secret:<docker hub passwd>
+-> set id and description as dockerhubpasswd --> Add
+-> Generate Pipeline Script
+--> copy and past .....
+
+****
+we have to deploy in a remote server...install ssh agent plugins
+-> install ssh agent plugins
+-> click on Pipeline syntax
+-> Steps:Sample steps-> sshagent: SSH Agent
+-> Add->jenkins->ssh username with private key->
+-> Scope: Global jenkins nodes items all child items etc
+-> ID: dockerhost
+-> Description: dockerhost
+-> Username: ec2-user
+-> Private Key: o Enter directly
+-> copy and past the key
+=> Generate Pipeline script
+-> copy and past 
+
+
+
+
+dockerfile
+==========
+FROM centos:latest
+MAINTAINER sdlc
+RUN yum install httpd -y 
+ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip  /var/www/html/
+WORKDIR /var/www/html
+RUN unzip photogenic.zip
+RUN cp -rf photogenic/*  .
+RUN rm -rf photogenic photogenic.zip
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+EXPOSE 80
+
+
+google.com-->sample website download --> use another/different url
+ex:: https://www.free-css.com/assets/files/free-css-templates/download/page290/cryptop.zip
+======================================================================
+
+at the end set webhook ... to automate build in jenkins
+
+
+
+
+    

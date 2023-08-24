@@ -1,0 +1,19 @@
+copy pest ubuntu
+----------------
+sudo apt update -y
+sudo apt install open-vm-tools-desktop -y
+----------------------------
+sudo apt update -y
+sudo cat /etc/os-release 
+sudo reboot
+sudo apt-get install virtualbox-guest-additions-iso
+init 6
+sudo apt install open-vm-tools-desktop -y
+sudo reboot
+sudo apt-get install build-essential linux-headers-generic
+init 6
+sudo apt update -y
+sudo apt upgrade -y
+sudo reboot
+ 
+
